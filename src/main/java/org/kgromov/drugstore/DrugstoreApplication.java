@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @SpringBootApplication
 public class DrugstoreApplication {
@@ -21,7 +22,13 @@ public class DrugstoreApplication {
     @Bean
     ApplicationRunner applicationRunner(DrugsRepository drugsRepository) {
         return args -> {
-            var antibiotics = new DrugsInfo(1, "Antibiotics", DrugsForm.TABLET, Category.CURES, LocalDate.now().plusDays(3));
+            var antibiotics = DrugsInfo.builder()
+                    .name("Antibiotics")
+                    .category(Category.CURES)
+                    .form(DrugsForm.TABLET)
+                    .expirationDate(LocalDate.now().plusDays(3))
+                    .md5(UUID.randomUUID().toString().substring(0, 32))
+                    .build();
             drugsRepository.save(antibiotics);
             drugsRepository.findAll().forEach(System.out::println);
         };

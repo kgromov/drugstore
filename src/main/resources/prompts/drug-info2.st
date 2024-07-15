@@ -3,4 +3,4 @@ Respond with the following format:
            The drugs has a name of ```name```.
            The drugs has a form of ```form```.
            The drugs has a category of ```category```.
-           The drugs expired at ```expirationDate```.
+           The drugs expired at ```expirationDate``` If no day provided - use 1st day of month.

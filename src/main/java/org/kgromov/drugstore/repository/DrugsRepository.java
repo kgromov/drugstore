@@ -1,6 +1,7 @@
 package org.kgromov.drugstore.repository;
 
 import lombok.RequiredArgsConstructor;
+import org.kgromov.drugstore.model.DrugsImageResponse;
 import org.kgromov.drugstore.model.DrugsInfo;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
@@ -15,17 +16,32 @@ public class DrugsRepository {
     private final JdbcClient jdbcClient;
 
     @Transactional(readOnly = true)
-    public List<DrugsInfo> findAll() {
+    public List<DrugsImageResponse> findAll() {
         return jdbcClient.sql("SELECT * FROM DrugsInfo")
-                .query(DrugsInfo.class)
+                .query(DrugsImageResponse.class)
                 .list();
+    }
+
+    @Transactional(readOnly = true)
+    public boolean hasDrugsByDigest(String digest) {
+        return jdbcClient.sql("SELECT COUNT(*) FROM DrugsInfo WHERE md5= :digest")
+                .param("digest", digest)
+                .query(Long.class)
+                .single() > 0;
     }
 
     @Transactional
     public void save(DrugsInfo drugsInfo) {
-        var updated = jdbcClient.sql("INSERT INTO DrugsInfo(name, form, category, expiration_date) values(?,?,?,?)")
-                .params(List.of(drugsInfo.name(), drugsInfo.form().name(), drugsInfo.category().name(), drugsInfo.expirationDate()))
+        var updated = jdbcClient.sql("INSERT INTO DrugsInfo(name, form, category, expiration_date, md5) values(?,?,?,?,?)")
+                .params(List.of(
+                                drugsInfo.getName(),
+                                drugsInfo.getForm().name(),
+                                drugsInfo.getCategory().name(),
+                                drugsInfo.getExpirationDate(),
+                                drugsInfo.getMd5()
+                        )
+                )
                 .update();
-        Assert.state(updated == 1, STR."Failed to insert drugs info \{drugsInfo.name()}");
+        Assert.state(updated == 1, STR."Failed to insert drugs info \{drugsInfo.getName()}");
     }
 }
