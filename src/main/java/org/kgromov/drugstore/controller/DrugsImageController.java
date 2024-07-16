@@ -16,13 +16,13 @@ public class DrugsImageController {
     private final DrugsImageService drugsImageService;
 
     @GetMapping("/test")
-    public void processSample(@RequestParam String image) {
+    public void createSample(@RequestParam String image) {
         var imageResource = new ClassPathResource("/images/%s".formatted(image));
         drugsImageService.processImage(imageResource);
     }
 
     @PostMapping(value = "/upload-image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public void processUpload(@RequestParam("file") MultipartFile file) {
+    public void upload(@RequestParam("file") MultipartFile file) {
         drugsImageService.processImage(file.getResource());
     }
 }
