@@ -1,21 +1,18 @@
 package org.kgromov.drugstore;
 
 import org.kgromov.drugstore.config.SmsSettings;
-import org.kgromov.drugstore.model.Category;
-import org.kgromov.drugstore.model.DrugsForm;
-import org.kgromov.drugstore.model.DrugsInfo;
 import org.kgromov.drugstore.repository.DrugsRepository;
+import org.kgromov.drugstore.repository.RecipientRepository;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
-import java.time.LocalDate;
-import java.util.UUID;
-
-@SpringBootApplication
+@EnableScheduling
 @EnableConfigurationProperties({SmsSettings.class})
+@SpringBootApplication
 public class DrugstoreApplication {
 
     public static void main(String[] args) {
@@ -23,17 +20,10 @@ public class DrugstoreApplication {
     }
 
     @Bean
-    ApplicationRunner applicationRunner(DrugsRepository drugsRepository) {
-        return args -> {
-            var antibiotics = DrugsInfo.builder()
-                    .name("Antibiotics")
-                    .category(Category.CURES)
-                    .form(DrugsForm.TABLET)
-                    .expirationDate(LocalDate.now().plusDays(3))
-                    .md5(UUID.randomUUID().toString().substring(0, 32))
-                    .build();
-            drugsRepository.save(antibiotics);
+    ApplicationRunner applicationRunner(DrugsRepository drugsRepository, RecipientRepository recipientRepository) {
+        return _ -> {
             drugsRepository.findAll().forEach(System.out::println);
+            recipientRepository.findAll().forEach(System.out::println);
         };
     }
 }

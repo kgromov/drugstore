@@ -1,7 +1,6 @@
 package org.kgromov.drugstore.repository;
 
 import lombok.RequiredArgsConstructor;
-import org.kgromov.drugstore.model.DrugsImageResponse;
 import org.kgromov.drugstore.model.DrugsInfo;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;

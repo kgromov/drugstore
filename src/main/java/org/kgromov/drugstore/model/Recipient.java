@@ -2,8 +2,6 @@ package org.kgromov.drugstore.model;
 
 import lombok.*;
 
-
-// TODO: seems to be another repository
 @Data
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
