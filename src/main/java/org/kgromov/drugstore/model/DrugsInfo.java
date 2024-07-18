@@ -15,4 +15,5 @@ public class DrugsInfo {
     private Category category;
     private LocalDate expirationDate;
     private String md5;
+    // private quantity;
 }

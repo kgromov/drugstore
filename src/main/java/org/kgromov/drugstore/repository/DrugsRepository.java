@@ -50,7 +50,7 @@ public class DrugsRepository {
                         )
                 )
                 .update();
-        Assert.state(updated == 1, STR."Failed to insert drugs info \{drugsInfo.getName()}");
+        Assert.state(updated == 1, "Failed to insert drugs info " + drugsInfo.getName());
     }
 
     @Transactional
@@ -58,14 +58,24 @@ public class DrugsRepository {
         int updated = jdbcClient.sql("UPDATE DrugsInfo SET name = :name, form = :form, category = :category, expiration_date = :expiration_date WHERE id = :id")
                 .params(List.of(drugsInfo.getName(), drugsInfo.getForm().name(), drugsInfo.getCategory().name(), drugsInfo.getExpirationDate(), drugsInfo.getId()))
                 .update();
-        Assert.state(updated == 1, STR."Failed to update drugs info \{drugsInfo.getName()}");
+        Assert.state(updated == 1, "Failed to update drugs info " + drugsInfo.getName());
+    }
+    
+    @Transactional
+    public void delete(DrugsInfo drugsInfo) {
+        int updated = executeDelete(drugsInfo.getId());
+        Assert.state(updated == 1, "Failed to update drugs info " + drugsInfo.getName());
     }
 
     @Transactional
     public void deleteById(int id) {
-        int updated = jdbcClient.sql("DELETE FROM DrugsInfo WHERE id = :id")
+        int updated = executeDelete(id);
+        Assert.state(updated == 1, "Failed to update drugs info " + id);
+    }
+
+    private int executeDelete(int id) {
+        return jdbcClient.sql("DELETE FROM DrugsInfo WHERE id = :id")
                 .param("id", id)
                 .update();
-        Assert.state(updated == 1, STR."Failed to delete drugs info \{id}");
     }
 }

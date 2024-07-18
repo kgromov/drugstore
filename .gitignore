@@ -32,3 +32,10 @@ build/
 ### VS Code ###
 .vscode/
 /src/main/resources/images/
+
+# The following files are generated/updated by vaadin-maven-plugin
+node_modules/
+pnpmfile.js
+vite.generated.ts
+/src/main/bundles/
+/src/main/frontend/

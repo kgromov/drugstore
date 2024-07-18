@@ -15,7 +15,8 @@ public class SmsNotificationService implements NotificationService {
     @Override
     public void onDrugExpired(Recipient recipient, DrugsInfo drugsInfo) {
         log.info("Drug {} expired on {}", drugsInfo.getName(), drugsInfo.getExpirationDate());
-        String message =  STR."\{drugsInfo.getName()} of category = \{drugsInfo.getCategory()} is expired on \{drugsInfo.getExpirationDate()}";
+        String message = "%s of category = %s is expired on %s"
+                .formatted(drugsInfo.getName(), drugsInfo.getCategory(), drugsInfo.getExpirationDate());
         smsService.sendMessage(recipient.getPhoneNumber(), message);
     }
 }
