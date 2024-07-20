@@ -7,14 +7,16 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.editor.Editor;
+import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.data.validator.EmailValidator;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +26,10 @@ import org.kgromov.drugstore.model.DrugsForm;
 import org.kgromov.drugstore.model.DrugsInfo;
 import org.kgromov.drugstore.repository.DrugsRepository;
 import org.kgromov.drugstore.service.DrugsImageService;
+import org.kgromov.drugstore.ui.model.DrugsFilter;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 @Slf4j
 @Route(value = "/")
@@ -42,9 +46,9 @@ public class DrugsListView extends VerticalLayout {
         if (event.isInitialAttach()) {
             this.configureGrid();
             this.configureUpload();     // TODO: dialogue with toolbar button is the best option
-            this.configureFilter();      // TODO: either as toolbar or better on top of table columns
+            this.configureFilter();      
             add(/*this.createToolbar(),*/ this.grid);
-            setSizeFull();
+//            setSizeFull();
         }
     }
 
@@ -60,15 +64,16 @@ public class DrugsListView extends VerticalLayout {
         Editor<DrugsInfo> editor = grid.getEditor();
 
         var nameColumn = grid.addColumn(DrugsInfo::getName)
-                .setHeader("Name");
+                .setAutoWidth(true)
+                .setSortable(true);
         var categoryColumn = grid.addColumn(DrugsInfo::getCategory)
-                .setHeader("Category")
+                .setSortable(true)
                 .setWidth("150px").setFlexGrow(0);
         var formTypeColumn = grid.addColumn(DrugsInfo::getForm)
-                .setHeader("Form")
+                .setSortable(true)
                 .setWidth("150px").setFlexGrow(0);
         var expirationDateColumn = grid.addColumn(DrugsInfo::getExpirationDate)
-                .setHeader("Expiration date")
+                .setSortable(true)
                 .setWidth("150px").setFlexGrow(0);
 
         var editColumn = grid.addComponentColumn(drug -> {
@@ -129,9 +134,36 @@ public class DrugsListView extends VerticalLayout {
         expirationDateColumn.setEditorComponent(expirationDateField);
         this.setupGridEditor(editColumn);
 
-        grid.setItems(drugsRepository.findAll());
+        getUI().ifPresent(ui -> {
+            var items = drugsRepository.findAll();
+            ui.access(() -> {
+                grid.setItems(items);
+                DrugsFilter filter = new DrugsFilter(grid.getListDataView());
+                HeaderRow headerRow = grid.appendHeaderRow();
+                headerRow.getCell(nameColumn).setComponent(this.createFilterHeader("Name", filter::setName));
+                headerRow.getCell(categoryColumn).setComponent(this.createFilterHeader("Category", filter::setCategory));
+                headerRow.getCell(formTypeColumn).setComponent(this.createFilterHeader("Form", filter::setForm));
+                headerRow.getCell(expirationDateColumn).setComponent(this.createFilterHeader("Expiration date", filter::setExpirationDate));
+            });
+        });
     }
 
+    private Component createFilterHeader(String header, Consumer<String> filterChanges) {
+        NativeLabel label = new NativeLabel(header);
+        label.getStyle().set("padding-top", "var(--lumo-space-m)")
+                .set("font-size", "var(--lumo-font-size-xs)");
+        TextField textField = new TextField();
+        textField.setValueChangeMode(ValueChangeMode.EAGER);
+        textField.setClearButtonVisible(true);
+        textField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        textField.setWidthFull();
+        textField.getStyle().set("max-width", "100%");
+        textField.addValueChangeListener(e -> filterChanges.accept(e.getValue()));
+        VerticalLayout layout = new VerticalLayout(label, textField);
+        layout.getThemeList().clear();
+        layout.getThemeList().add("spacing-xs");
+        return layout;
+    }
     private Component createToolbar() {
 
         return null;
