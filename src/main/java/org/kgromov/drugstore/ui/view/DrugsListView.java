@@ -25,7 +25,7 @@ import org.kgromov.drugstore.model.Category;
 import org.kgromov.drugstore.model.DrugsForm;
 import org.kgromov.drugstore.model.DrugsInfo;
 import org.kgromov.drugstore.repository.DrugsRepository;
-import org.kgromov.drugstore.service.DrugsImageService;
+import org.kgromov.drugstore.ui.components.DrugsUploader;
 import org.kgromov.drugstore.ui.model.DrugsFilter;
 
 import java.util.List;
@@ -36,27 +36,29 @@ import java.util.function.Consumer;
 @PageTitle("Drugs")
 @RequiredArgsConstructor
 public class DrugsListView extends VerticalLayout {
-    private final DrugsImageService drugsImageService;
     private final DrugsRepository drugsRepository;
-
+    private final DrugsUploader drugsUploader;
     private Grid<DrugsInfo> grid;
 
     @Override
     protected void onAttach(AttachEvent event) {
         if (event.isInitialAttach()) {
             this.configureGrid();
-            this.configureUpload();     // TODO: dialogue with toolbar button is the best option
-            this.configureFilter();      
-            add(/*this.createToolbar(),*/ this.grid);
-//            setSizeFull();
+            // TODO: dialogue with toolbar button is the best option
+//            add(this.createToolbar(), this.grid);
+            add(this.drugsUploader, this.grid);
+            this.subscribeToUploadChanges();
+            setSizeFull();
         }
     }
 
-    private void configureUpload() {
-
-    }
-
-    private void configureFilter() {
+    private void subscribeToUploadChanges() {
+        this.drugsUploader.emitter()
+                .filter(e -> e)
+                .subscribe(_ -> getUI().ifPresent(ui -> ui.access(() -> {
+                    grid.setItems(drugsRepository.findAll());
+                    this.grid.getListDataView().refreshAll();
+                })));
     }
 
     private void configureGrid() {
@@ -164,9 +166,12 @@ public class DrugsListView extends VerticalLayout {
         layout.getThemeList().add("spacing-xs");
         return layout;
     }
-    private Component createToolbar() {
 
-        return null;
+    // TODO:makes sense only as alternative to statically defined uploader - to show in dialogue
+    private Component createToolbar() {
+        Button uploadButton = new Button("Upload", VaadinIcon.ARROW_UP.create());
+        HorizontalLayout toolbar = new HorizontalLayout(uploadButton);
+        return toolbar;
     }
 
     private void setupGridEditor(Grid.Column<DrugsInfo> editColumn) {

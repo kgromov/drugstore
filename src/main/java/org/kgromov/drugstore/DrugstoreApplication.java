@@ -1,5 +1,7 @@
 package org.kgromov.drugstore;
 
+import com.vaadin.flow.component.page.AppShellConfigurator;
+import com.vaadin.flow.component.page.Push;
 import org.kgromov.drugstore.config.SmsSettings;
 import org.kgromov.drugstore.repository.DrugsRepository;
 import org.kgromov.drugstore.repository.RecipientRepository;
@@ -10,10 +12,11 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+@Push           // try to move to ui package
 @EnableScheduling
 @EnableConfigurationProperties({SmsSettings.class})
 @SpringBootApplication
-public class DrugstoreApplication {
+public class DrugstoreApplication implements AppShellConfigurator {
 
     public static void main(String[] args) {
         SpringApplication.run(DrugstoreApplication.class, args);
