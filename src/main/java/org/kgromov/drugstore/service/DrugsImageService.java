@@ -3,11 +3,13 @@ package org.kgromov.drugstore.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.kgromov.drugstore.model.DrugsImageResponse;
 import org.kgromov.drugstore.model.DrugsInfo;
 import org.kgromov.drugstore.repository.DrugsRepository;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.converter.BeanOutputConverter;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +35,7 @@ public class DrugsImageService {
                 return;
             }
 //            DrugsInfo drugsInfo = this.convertToMode(new FileSystemResource(image));
+//            Resource resource = new ByteArrayResource((imageResource.getContentAsByteArray()));
             var response = this.convertToModel(imageResource);
             var drugsInfo =  DrugsInfo.builder()
                     .name(response.name())

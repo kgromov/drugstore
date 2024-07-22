@@ -15,7 +15,9 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.kgromov.drugstore.service.DrugsImageService;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.util.MimeTypeUtils;
 import reactor.core.publisher.Flux;
@@ -45,14 +47,14 @@ public class DrugsUploader extends VerticalLayout {
     }
 
     private void configureFileUploader() {
-        fileUploader.setMaxFileSize(5 * 1024 * 1024);
+        fileUploader.setMaxFileSize(8 * 1024 * 1024);
         fileUploader.setAcceptedFileTypes(
                 MimeTypeUtils.IMAGE_PNG_VALUE,
                 MimeTypeUtils.IMAGE_JPEG_VALUE
         );
         fileUploader.setAutoUpload(false);
         fileUploader.setMaxFiles(10);
-        fileUploader.setDropLabel(new Span("Drop pdf files to merge"));
+        fileUploader.setDropLabel(new Span("Drop image here"));
        /* errorField = new Span();
         errorField.setVisible(false);
         errorField.getStyle().set("color", "red");*/
@@ -63,7 +65,9 @@ public class DrugsUploader extends VerticalLayout {
             try (InputStream fileData = memoryBuffer.getInputStream(fileName)) {
                 long contentLength = event.getContentLength();
                 log.info("File {} uploaded: length = {} KB", fileName, contentLength / 1024);
-                drugsImageService.processImage(new InputStreamResource(fileData));
+                byte[] byteArray = IOUtils.toByteArray(fileData);
+//                drugsImageService.processImage(new InputStreamResource(fileData));
+                drugsImageService.processImage(new ByteArrayResource(byteArray));
                 this.imageRecognitionSubject.tryEmitNext(true);
                 this.showSuccessNotification("File " + fileName + " uploaded");
             } catch (Exception e) {
@@ -73,6 +77,8 @@ public class DrugsUploader extends VerticalLayout {
         });
         fileUploader.addFileRejectedListener(event -> this.showErrorNotification(event.getErrorMessage()));
         fileUploader.addFailedListener(event -> this.showErrorNotification(event.getReason().getMessage()));
+
+        add(this.fileUploader, this.uploadAllButton);
     }
 
     private void configureUpload() {
@@ -85,7 +91,6 @@ public class DrugsUploader extends VerticalLayout {
             // No explicit Flow API for this at the moment
             fileUploader.getElement().callJsFunction("uploadFiles");
         });
-        add(uploadAllButton);
     }
 
     private void showSuccessNotification(String message) {

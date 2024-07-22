@@ -15,7 +15,7 @@ import java.io.InputStream;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ImageUtils {
 
-    // FileSystemResource
+    // TODO: replace destImgPath with temp file
     @SneakyThrows
     public static File resizeImage(InputStream source, String destImgPath, int targetWidth, int targetHeight) {
         BufferedImage originalImage = ImageIO.read(source);
@@ -29,10 +29,10 @@ public class ImageUtils {
     }
 
     @SneakyThrows
-    public static File resizeImage(String sourceImgPath, String destImgPath, float scaleFactor) {
+    public static File resizeImage(String sourceImgPath, String destImgPath, int scaleFactor) {
         BufferedImage originalImage = ImageIO.read(new File(sourceImgPath));
-        int targetWidth = (int) (originalImage.getWidth() * scaleFactor);
-        int targetHeight = (int) (originalImage.getHeight() * scaleFactor);
+        int targetWidth = (int) (originalImage.getWidth() / scaleFactor);
+        int targetHeight = (int) (originalImage.getHeight() / scaleFactor);
         return resizeImage(originalImage, destImgPath, targetWidth, targetHeight);
     }
 

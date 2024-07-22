@@ -6,7 +6,8 @@ spring:
       api-key: ${OPENAI_API_KEY}
       chat:
         options:
-          model: gpt-4o
+#          model: gpt-4o
+          model: gpt-4o-mini
       embedding:
         options:
           model: text-embedding-3-small
@@ -15,6 +16,10 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
 
 # sms settings
 sms:
