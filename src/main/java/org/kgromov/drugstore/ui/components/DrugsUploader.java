@@ -4,7 +4,6 @@ import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -18,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.kgromov.drugstore.service.DrugsImageService;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.util.MimeTypeUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
@@ -35,7 +33,7 @@ public class DrugsUploader extends VerticalLayout {
     private final MultiFileMemoryBuffer memoryBuffer = new MultiFileMemoryBuffer();
     private final Upload fileUploader = new Upload(memoryBuffer);
     private Span errorField;
-    private final Button uploadAllButton = new Button("Upload", VaadinIcon.ARROW_UP.create());
+    private final Button uploadAllButton = new Button("Upload");
 
     @Override
     protected void onAttach(AttachEvent attachEvent) {
@@ -66,7 +64,6 @@ public class DrugsUploader extends VerticalLayout {
                 long contentLength = event.getContentLength();
                 log.info("File {} uploaded: length = {} KB", fileName, contentLength / 1024);
                 byte[] byteArray = IOUtils.toByteArray(fileData);
-//                drugsImageService.processImage(new InputStreamResource(fileData));
                 drugsImageService.processImage(new ByteArrayResource(byteArray));
                 this.imageRecognitionSubject.tryEmitNext(true);
                 this.showSuccessNotification("File " + fileName + " uploaded");

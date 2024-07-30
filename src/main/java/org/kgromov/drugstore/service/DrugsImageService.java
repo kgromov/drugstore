@@ -37,7 +37,7 @@ public class DrugsImageService {
 //            DrugsInfo drugsInfo = this.convertToMode(new FileSystemResource(image));
 //            Resource resource = new ByteArrayResource((imageResource.getContentAsByteArray()));
             var response = this.convertToModel(imageResource);
-            var drugsInfo =  DrugsInfo.builder()
+            var drugsInfo = DrugsInfo.builder()
                     .name(response.name())
                     .category(response.category())
                     .form(response.form())

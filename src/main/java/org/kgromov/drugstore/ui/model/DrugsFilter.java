@@ -56,6 +56,5 @@ public class DrugsFilter {
 
     private boolean matches(String value, String searchTerm) {
         return isBlank(searchTerm) || containsIgnoreCase(value, searchTerm);
-//                || (isNotBlank(value) && value.toLowerCase().contains(searchTerm.toLowerCase()));
     }
 }
